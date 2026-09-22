@@ -4,14 +4,21 @@
 <head>
 
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Solar Panel Monitoring System</title>
 
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<!-- SHEETJS UNTUK EXPORT EXCEL -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <style>
+
+/* =========================================================
+   DASAR
+   ========================================================= */
 
 *{
   box-sizing:border-box;
@@ -24,13 +31,13 @@ body{
   color:#0f172a;
 }
 
-/* ==============================
+/* =========================================================
    HEADER
-   ============================== */
+   ========================================================= */
 
 .header{
   background:#0f172a;
-  color:#fff;
+  color:white;
   padding:22px 16px;
   text-align:center;
 }
@@ -45,9 +52,9 @@ body{
   color:#cbd5e1;
 }
 
-/* ==============================
+/* =========================================================
    CONTAINER
-   ============================== */
+   ========================================================= */
 
 .container{
   max-width:1200px;
@@ -55,9 +62,20 @@ body{
   padding:20px;
 }
 
-/* ==============================
-   PANEL GRID
-   ============================== */
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.card{
+  background:white;
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+/* =========================================================
+   PANEL
+   ========================================================= */
 
 .grid{
   display:grid;
@@ -65,26 +83,11 @@ body{
   gap:16px;
 }
 
-/* ==============================
-   CARD
-   ============================== */
-
-.card{
-  background:#fff;
-  border-radius:14px;
-  padding:18px;
-  box-shadow:0 3px 12px rgba(0,0,0,.08);
-}
-
 .panel-title{
   font-size:21px;
   font-weight:bold;
   margin-bottom:14px;
 }
-
-/* ==============================
-   VALUE
-   ============================== */
 
 .value{
   display:flex;
@@ -101,9 +104,9 @@ body{
   font-weight:bold;
 }
 
-/* ==============================
+/* =========================================================
    SUMMARY
-   ============================== */
+   ========================================================= */
 
 .summary{
   display:grid;
@@ -122,9 +125,9 @@ body{
   margin-top:8px;
 }
 
-/* ==============================
+/* =========================================================
    CONTROL
-   ============================== */
+   ========================================================= */
 
 .controls{
   display:grid;
@@ -139,10 +142,6 @@ body{
   margin:10px 0 15px;
 }
 
-/* ==============================
-   BUTTON
-   ============================== */
-
 button{
   border:0;
   border-radius:10px;
@@ -154,7 +153,7 @@ button{
 }
 
 button:hover{
-  opacity:.85;
+  opacity:.9;
 }
 
 button:disabled{
@@ -164,31 +163,99 @@ button:disabled{
 
 .on{
   background:#16a34a;
-  color:#fff;
+  color:white;
 }
 
 .off{
   background:#dc2626;
-  color:#fff;
+  color:white;
 }
 
 .motor{
   background:#2563eb;
-  color:#fff;
+  color:white;
 }
 
 .stop{
   background:#475569;
-  color:#fff;
+  color:white;
 }
 
-/* ==============================
+/* =========================================================
+   EXPORT
+   ========================================================= */
+
+.export-card{
+  margin-top:16px;
+}
+
+.export-title{
+  font-size:21px;
+  font-weight:bold;
+  margin-bottom:15px;
+}
+
+.export-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.input-group{
+  display:flex;
+  flex-direction:column;
+}
+
+.input-group label{
+  font-weight:bold;
+  margin-bottom:7px;
+}
+
+.input-group input{
+  padding:12px;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  font-size:15px;
+  width:100%;
+}
+
+.export-button{
+  margin-top:16px;
+  background:#15803d;
+  color:white;
+  width:100%;
+  padding:14px;
+  font-size:16px;
+}
+
+.export-button:hover{
+  background:#166534;
+}
+
+.export-status{
+  margin-top:12px;
+  text-align:center;
+  font-size:14px;
+  color:#475569;
+}
+
+.export-success{
+  color:#15803d;
+  font-weight:bold;
+}
+
+.export-error{
+  color:#dc2626;
+  font-weight:bold;
+}
+
+/* =========================================================
    INFO
-   ============================== */
+   ========================================================= */
 
 .info{
   margin-top:16px;
-  background:#fff;
+  background:white;
   border-radius:14px;
   padding:14px;
   text-align:center;
@@ -216,15 +283,16 @@ button:disabled{
   margin-top:8px;
 }
 
-/* ==============================
+/* =========================================================
    RESPONSIVE
-   ============================== */
+   ========================================================= */
 
 @media(max-width:850px){
 
   .grid,
   .summary,
-  .controls{
+  .controls,
+  .export-grid{
     grid-template-columns:1fr;
   }
 
@@ -238,9 +306,9 @@ button:disabled{
 <body>
 
 
-<!-- =====================================================
+<!-- =========================================================
      HEADER
-     ===================================================== -->
+     ========================================================= -->
 
 <div class="header">
 
@@ -255,18 +323,17 @@ button:disabled{
 </div>
 
 
-
 <div class="container">
 
 
-<!-- =====================================================
-     PANEL 1 - 2 - 3
-     ===================================================== -->
+<!-- =========================================================
+     PANEL 1, 2, 3
+     ========================================================= -->
 
 <div class="grid">
 
 
-  <!-- ================= PANEL 1 ================= -->
+  <!-- PANEL 1 -->
 
   <div class="card">
 
@@ -297,8 +364,7 @@ button:disabled{
   </div>
 
 
-
-  <!-- ================= PANEL 2 ================= -->
+  <!-- PANEL 2 -->
 
   <div class="card">
 
@@ -329,8 +395,7 @@ button:disabled{
   </div>
 
 
-
-  <!-- ================= PANEL 3 ================= -->
+  <!-- PANEL 3 -->
 
   <div class="card">
 
@@ -360,19 +425,15 @@ button:disabled{
 
   </div>
 
-
 </div>
 
 
-
-<!-- =====================================================
+<!-- =========================================================
      SUMMARY
-     ===================================================== -->
+     ========================================================= -->
 
 <div class="summary">
 
-
-  <!-- TOTAL DAYA -->
 
   <div class="card big-card">
 
@@ -381,20 +442,11 @@ button:disabled{
     </div>
 
     <div class="big-value">
-
-      <span id="totalPower">
-        --
-      </span>
-
-      W
-
+      <span id="totalPower">--</span> W
     </div>
 
   </div>
 
-
-
-  <!-- INTENSITAS CAHAYA -->
 
   <div class="card big-card">
 
@@ -403,20 +455,11 @@ button:disabled{
     </div>
 
     <div class="big-value">
-
-      <span id="light">
-        --
-      </span>
-
-      lux
-
+      <span id="light">--</span> lux
     </div>
 
   </div>
 
-
-
-  <!-- FLOW -->
 
   <div class="card big-card">
 
@@ -425,13 +468,7 @@ button:disabled{
     </div>
 
     <div class="big-value">
-
-      <span id="flow">
-        --
-      </span>
-
-      L/min
-
+      <span id="flow">--</span> L/min
     </div>
 
   </div>
@@ -440,20 +477,16 @@ button:disabled{
 </div>
 
 
-
-<!-- =====================================================
+<!-- =========================================================
      CONTROL
-     ===================================================== -->
+     ========================================================= -->
 
 <div class="controls">
 
 
-  <!-- ================= POMPA ================= -->
+  <!-- POMPA -->
 
-  <div
-    class="card"
-    style="text-align:center"
-  >
+  <div class="card" style="text-align:center">
 
     <h2>
       💧 Pompa Penyemprot
@@ -462,13 +495,11 @@ button:disabled{
     <div class="status">
 
       Status:
-
       <span id="pumpStatus">
         OFF
       </span>
 
     </div>
-
 
     <button
       class="on"
@@ -476,7 +507,6 @@ button:disabled{
     >
       POMPA ON
     </button>
-
 
     <button
       class="off"
@@ -488,13 +518,9 @@ button:disabled{
   </div>
 
 
+  <!-- MOTOR -->
 
-  <!-- ================= MOTOR ================= -->
-
-  <div
-    class="card"
-    style="text-align:center"
-  >
+  <div class="card" style="text-align:center">
 
     <h2>
       ↕ Kemiringan Panel
@@ -503,13 +529,11 @@ button:disabled{
     <div class="status">
 
       Motor:
-
       <span id="motorStatus">
         STOP
       </span>
 
     </div>
-
 
     <button
       class="motor"
@@ -518,14 +542,12 @@ button:disabled{
       ◀ KIRI
     </button>
 
-
     <button
       class="stop"
       onclick="setMotor('STOP')"
     >
       STOP
     </button>
-
 
     <button
       class="motor"
@@ -540,10 +562,77 @@ button:disabled{
 </div>
 
 
+<!-- =========================================================
+     EXPORT EXCEL
+     ========================================================= -->
 
-<!-- =====================================================
+<div class="card export-card">
+
+  <div class="export-title">
+    📊 EXPORT DATA KE EXCEL
+  </div>
+
+
+  <div class="export-grid">
+
+
+    <!-- TANGGAL/JAM MULAI -->
+
+    <div class="input-group">
+
+      <label for="startDate">
+        Waktu Mulai
+      </label>
+
+      <input
+        type="datetime-local"
+        id="startDate"
+      >
+
+    </div>
+
+
+    <!-- TANGGAL/JAM AKHIR -->
+
+    <div class="input-group">
+
+      <label for="endDate">
+        Waktu Akhir
+      </label>
+
+      <input
+        type="datetime-local"
+        id="endDate"
+      >
+
+    </div>
+
+
+  </div>
+
+
+  <button
+    class="export-button"
+    id="exportButton"
+    onclick="exportExcel()"
+  >
+    📥 EXPORT DATA KE EXCEL
+  </button>
+
+
+  <div
+    id="exportStatus"
+    class="export-status"
+  >
+    Pilih waktu mulai dan waktu akhir kemudian tekan tombol export.
+  </div>
+
+</div>
+
+
+<!-- =========================================================
      STATUS SUPABASE
-     ===================================================== -->
+     ========================================================= -->
 
 <div class="info">
 
@@ -559,15 +648,7 @@ button:disabled{
 
   <div class="small">
 
-    Data sensor dari ESP32 dikirim ke Supabase setiap
-    <b>1 menit</b>.
-
-  </div>
-
-
-  <div class="small">
-
-    Dashboard melakukan pengecekan data secara otomatis.
+    Data monitoring diperbarui otomatis setiap 2 detik.
 
   </div>
 
@@ -583,23 +664,14 @@ button:disabled{
 </div>
 
 
-
 <script>
-
 
 /* =========================================================
    SUPABASE CONFIGURATION
    =========================================================
 
-   GANTI:
-
-   1. SUPABASE_URL
-   2. SUPABASE_ANON_KEY
-
-   JANGAN gunakan service_role key.
-
+   GANTI DENGAN DATA SUPABASE KAMU
    ========================================================= */
-
 
 const SUPABASE_URL =
   "https://xkiumhyccalpoinentfz.supabase.co";
@@ -616,15 +688,11 @@ const supabaseClient =
   );
 
 
-
 /* =========================================================
-   HELPER NUMBER
+   HELPER ANGKA
    ========================================================= */
 
-function numberValue(
-  value,
-  decimals = 2
-){
+function numberValue(value, decimals = 2){
 
   const n = Number(value);
 
@@ -635,9 +703,8 @@ function numberValue(
 }
 
 
-
 /* =========================================================
-   HELPER TEMPERATURE
+   HELPER SUHU
    ========================================================= */
 
 function temperatureValue(value){
@@ -651,9 +718,8 @@ function temperatureValue(value){
 }
 
 
-
 /* =========================================================
-   MESSAGE
+   PESAN
    ========================================================= */
 
 function showMessage(
@@ -674,15 +740,16 @@ function showMessage(
 }
 
 
-
 /* =========================================================
-   DISPLAY DATA
+   MENAMPILKAN DATA SENSOR
    ========================================================= */
 
 function displayData(d){
 
 
-  /* ================= PANEL 1 ================= */
+  /* =========================
+     PANEL 1
+     ========================= */
 
   document.getElementById("p1v").textContent =
     numberValue(
@@ -711,8 +778,9 @@ function displayData(d){
     );
 
 
-
-  /* ================= PANEL 2 ================= */
+  /* =========================
+     PANEL 2
+     ========================= */
 
   document.getElementById("p2v").textContent =
     numberValue(
@@ -741,8 +809,9 @@ function displayData(d){
     );
 
 
-
-  /* ================= PANEL 3 ================= */
+  /* =========================
+     PANEL 3
+     ========================= */
 
   document.getElementById("p3v").textContent =
     numberValue(
@@ -771,8 +840,9 @@ function displayData(d){
     );
 
 
-
-  /* ================= TOTAL DAYA ================= */
+  /* =========================
+     TOTAL DAYA
+     ========================= */
 
   document.getElementById("totalPower").textContent =
     numberValue(
@@ -781,8 +851,9 @@ function displayData(d){
     );
 
 
-
-  /* ================= CAHAYA ================= */
+  /* =========================
+     CAHAYA
+     ========================= */
 
   document.getElementById("light").textContent =
     numberValue(
@@ -791,8 +862,9 @@ function displayData(d){
     );
 
 
-
-  /* ================= FLOW ================= */
+  /* =========================
+     FLOW
+     ========================= */
 
   document.getElementById("flow").textContent =
     numberValue(
@@ -804,9 +876,8 @@ function displayData(d){
 }
 
 
-
 /* =========================================================
-   GET LATEST SENSOR DATA
+   MEMBACA DATA TERBARU
    ========================================================= */
 
 async function getLatestData(){
@@ -831,8 +902,9 @@ async function getLatestData(){
     .limit(1);
 
 
-
-  /* ================= ERROR ================= */
+  /* =========================
+     ERROR
+     ========================= */
 
   if(error){
 
@@ -859,8 +931,9 @@ async function getLatestData(){
   }
 
 
-
-  /* ================= NO DATA ================= */
+  /* =========================
+     BELUM ADA DATA
+     ========================= */
 
   if(
     !data ||
@@ -888,16 +961,14 @@ async function getLatestData(){
   }
 
 
-
-  /* ================= DISPLAY ================= */
+  /* =========================
+     TAMPILKAN DATA
+     ========================= */
 
   displayData(
     data[0]
   );
 
-
-
-  /* ================= STATUS ================= */
 
   document.getElementById(
     "connection"
@@ -911,28 +982,18 @@ async function getLatestData(){
     "online";
 
 
-
-  /* ================= WAKTU DATA ================= */
-
-  if(data[0]["Waktu"]){
-
-    showMessage(
-      "Data terakhir: " +
-      new Date(
-        data[0]["Waktu"]
-      ).toLocaleString(
-        "id-ID"
-      )
-    );
-
-  }
+  showMessage(
+    "Data terakhir: " +
+    new Date(
+      data[0]["Waktu"]
+    ).toLocaleString("id-ID")
+  );
 
 }
 
 
-
 /* =========================================================
-   GET CURRENT CONTROL STATE
+   MEMBACA STATUS KONTROL
    ========================================================= */
 
 async function getControlState(){
@@ -957,9 +1018,6 @@ async function getControlState(){
     .single();
 
 
-
-  /* ================= ERROR ================= */
-
   if(error){
 
     showMessage(
@@ -973,8 +1031,9 @@ async function getControlState(){
   }
 
 
-
-  /* ================= POMPA ================= */
+  /* =========================
+     POMPA
+     ========================= */
 
   const pumpStatus =
     document.getElementById(
@@ -994,8 +1053,9 @@ async function getControlState(){
       : "#dc2626";
 
 
-
-  /* ================= MOTOR ================= */
+  /* =========================
+     MOTOR
+     ========================= */
 
   const motorStatus =
     document.getElementById(
@@ -1004,8 +1064,7 @@ async function getControlState(){
 
 
   motorStatus.textContent =
-    data.motor ||
-    "STOP";
+    data.motor || "STOP";
 
 
   motorStatus.style.color =
@@ -1016,9 +1075,8 @@ async function getControlState(){
 }
 
 
-
 /* =========================================================
-   PUMP CONTROL
+   KONTROL POMPA
    ========================================================= */
 
 async function setPump(state){
@@ -1027,7 +1085,6 @@ async function setPump(state){
   showMessage(
     "Mengirim perintah pompa..."
   );
-
 
 
   const {
@@ -1051,9 +1108,6 @@ async function setPump(state){
     );
 
 
-
-  /* ================= ERROR ================= */
-
   if(error){
 
     showMessage(
@@ -1066,9 +1120,6 @@ async function setPump(state){
 
   }
 
-
-
-  /* ================= UPDATE STATUS ================= */
 
   const pumpStatus =
     document.getElementById(
@@ -1088,7 +1139,6 @@ async function setPump(state){
       : "#dc2626";
 
 
-
   showMessage(
     "Perintah pompa berhasil dikirim."
   );
@@ -1096,17 +1146,12 @@ async function setPump(state){
 }
 
 
-
 /* =========================================================
-   MOTOR CONTROL
+   KONTROL MOTOR
    ========================================================= */
 
-async function setMotor(
-  direction
-){
+async function setMotor(direction){
 
-
-  /* ================= VALIDASI ================= */
 
   if(
     ![
@@ -1121,11 +1166,9 @@ async function setMotor(
   }
 
 
-
   showMessage(
     "Mengirim perintah motor..."
   );
-
 
 
   const {
@@ -1149,9 +1192,6 @@ async function setMotor(
     );
 
 
-
-  /* ================= ERROR ================= */
-
   if(error){
 
     showMessage(
@@ -1164,9 +1204,6 @@ async function setMotor(
 
   }
 
-
-
-  /* ================= UPDATE STATUS ================= */
 
   const motorStatus =
     document.getElementById(
@@ -1184,13 +1221,11 @@ async function setMotor(
       : "#2563eb";
 
 
-
   showMessage(
     "Perintah motor berhasil dikirim."
   );
 
 }
-
 
 
 /* =========================================================
@@ -1206,29 +1241,8 @@ async function refreshDashboard(){
 }
 
 
-
-/* =========================================================
-   INITIAL LOAD
-   ========================================================= */
-
 refreshDashboard();
 
-
-
-/* =========================================================
-   AUTO REFRESH
-   =========================================================
-
-   Dashboard mengecek Supabase setiap 2 detik.
-
-   CATATAN:
-   ESP32 mengirim data baru setiap 1 menit.
-
-   Jadi walaupun dashboard mengecek setiap 2 detik,
-   data sensor baru akan berubah ketika ESP32 mengirim
-   data berikutnya.
-
-   ========================================================= */
 
 setInterval(
   refreshDashboard,
@@ -1236,14 +1250,737 @@ setInterval(
 );
 
 
+/* =========================================================
+   FORMAT DATETIME UNTUK SUPABASE
+   ========================================================= */
+
+function localDateTimeToISO(
+  value
+){
+
+  if(!value){
+
+    return null;
+
+  }
+
+
+  const date =
+    new Date(value);
+
+
+  if(
+    Number.isNaN(
+      date.getTime()
+    )
+  ){
+
+    return null;
+
+  }
+
+
+  return date.toISOString();
+
+}
+
+
+/* =========================================================
+   EXPORT EXCEL
+   ========================================================= */
+
+async function exportExcel(){
+
+
+  const startInput =
+    document.getElementById(
+      "startDate"
+    ).value;
+
+
+  const endInput =
+    document.getElementById(
+      "endDate"
+    ).value;
+
+
+  const status =
+    document.getElementById(
+      "exportStatus"
+    );
+
+
+  const button =
+    document.getElementById(
+      "exportButton"
+    );
+
+
+  /* =========================
+     VALIDASI
+     ========================= */
+
+  if(
+    !startInput ||
+    !endInput
+  ){
+
+    status.textContent =
+      "Silakan pilih waktu mulai dan waktu akhir.";
+
+    status.className =
+      "export-status export-error";
+
+    return;
+
+  }
+
+
+  const startDate =
+    new Date(
+      startInput
+    );
+
+
+  const endDate =
+    new Date(
+      endInput
+    );
+
+
+  if(
+    Number.isNaN(
+      startDate.getTime()
+    ) ||
+    Number.isNaN(
+      endDate.getTime()
+    )
+  ){
+
+    status.textContent =
+      "Format waktu tidak valid.";
+
+    status.className =
+      "export-status export-error";
+
+    return;
+
+  }
+
+
+  if(
+    startDate > endDate
+  ){
+
+    status.textContent =
+      "Waktu mulai tidak boleh lebih besar dari waktu akhir.";
+
+    status.className =
+      "export-status export-error";
+
+    return;
+
+  }
+
+
+  /* =========================
+     NONAKTIFKAN TOMBOL
+     ========================= */
+
+  button.disabled =
+    true;
+
+
+  button.textContent =
+    "⏳ MENGAMBIL DATA...";
+
+
+  status.textContent =
+    "Sedang mengambil data dari Supabase...";
+
+  status.className =
+    "export-status";
+
+
+  try{
+
+
+    /* =========================
+       KONVERSI WAKTU
+       ========================= */
+
+    const startISO =
+      startDate.toISOString();
+
+
+    const endISO =
+      endDate.toISOString();
+
+
+    /* =========================
+       ARRAY DATA
+       ========================= */
+
+    let allData = [];
+
+
+    /* =========================
+       PAGINATION
+
+       Supabase biasanya membatasi
+       hasil query dalam jumlah tertentu.
+
+       Kita mengambil data per 1000 baris.
+       ========================= */
+
+    const pageSize =
+      1000;
+
+
+    let from =
+      0;
+
+
+    let finished =
+      false;
+
+
+    while(!finished){
+
+
+      status.textContent =
+        "Mengambil data " +
+        (from + 1) +
+        " ...";
+
+
+      const to =
+        from + pageSize - 1;
+
+
+      const {
+        data,
+        error
+      } = await supabaseClient
+
+        .from("solar_data")
+
+        .select(
+          `
+          Waktu,
+          "Tegangan 1",
+          "Arus 1",
+          "Daya 1",
+          "Suhu 1",
+          "Tegangan 2",
+          "Arus 2",
+          "Daya 2",
+          "Suhu 2",
+          "Tegangan 3",
+          "Arus 3",
+          "Daya 3",
+          "Suhu 3",
+          "Daya Total",
+          "Intensitas Cahaya",
+          "Flow"
+          `
+        )
+
+        .gte(
+          "Waktu",
+          startISO
+        )
+
+        .lte(
+          "Waktu",
+          endISO
+        )
+
+        .order(
+          "Waktu",
+          {
+            ascending:true
+          }
+        )
+
+        .range(
+          from,
+          to
+        );
+
+
+      /* =========================
+         ERROR SUPABASE
+         ========================= */
+
+      if(error){
+
+        throw new Error(
+          "Gagal mengambil data: " +
+          error.message
+        );
+
+      }
+
+
+      /* =========================
+         DATA MASUK
+         ========================= */
+
+      if(
+        data &&
+        data.length > 0
+      ){
+
+        allData =
+          allData.concat(
+            data
+          );
+
+      }
+
+
+      /* =========================
+         CEK SELESAI
+         ========================= */
+
+      if(
+        !data ||
+        data.length < pageSize
+      ){
+
+        finished =
+          true;
+
+      }else{
+
+        from +=
+          pageSize;
+
+      }
+
+    }
+
+
+    /* =========================
+       CEK DATA
+       ========================= */
+
+    if(
+      allData.length === 0
+    ){
+
+      status.textContent =
+        "Tidak ada data pada periode yang dipilih.";
+
+      status.className =
+        "export-status export-error";
+
+      return;
+
+    }
+
+
+    /* =========================
+       SIAPKAN DATA EXCEL
+       ========================= */
+
+    const excelData =
+      allData.map(
+        row => ({
+
+          "Waktu":
+            row["Waktu"],
+
+          "Tegangan 1":
+            row["Tegangan 1"],
+
+          "Arus 1":
+            row["Arus 1"],
+
+          "Daya 1":
+            row["Daya 1"],
+
+          "Suhu 1":
+            row["Suhu 1"],
+
+          "Tegangan 2":
+            row["Tegangan 2"],
+
+          "Arus 2":
+            row["Arus 2"],
+
+          "Daya 2":
+            row["Daya 2"],
+
+          "Suhu 2":
+            row["Suhu 2"],
+
+          "Tegangan 3":
+            row["Tegangan 3"],
+
+          "Arus 3":
+            row["Arus 3"],
+
+          "Daya 3":
+            row["Daya 3"],
+
+          "Suhu 3":
+            row["Suhu 3"],
+
+          "Daya Total":
+            row["Daya Total"],
+
+          "Intensitas Cahaya":
+            row["Intensitas Cahaya"],
+
+          "Flow":
+            row["Flow"]
+
+        })
+      );
+
+
+    /* =========================
+       BUAT WORKSHEET
+       ========================= */
+
+    const worksheet =
+      XLSX.utils.json_to_sheet(
+        excelData
+      );
+
+
+    /* =========================
+       LEBAR KOLOM
+       ========================= */
+
+    worksheet["!cols"] = [
+
+      {
+        wch:22
+      },
+
+      {
+        wch:15
+      },
+
+      {
+        wch:12
+      },
+
+      {
+        wch:12
+      },
+
+      {
+        wch:12
+      },
+
+      {
+        wch:15
+      },
+
+      {
+        wch:12
+      },
+
+      {
+        wch:12
+      },
+
+      {
+        wch:12
+      },
+
+      {
+        wch:15
+      },
+
+      {
+        wch:12
+      },
+
+      {
+        wch:12
+      },
+
+      {
+        wch:12
+      },
+
+      {
+        wch:15
+      },
+
+      {
+        wch:20
+      },
+
+      {
+        wch:12
+      }
+
+    ];
+
+
+    /* =========================
+       BUAT WORKBOOK
+       ========================= */
+
+    const workbook =
+      XLSX.utils.book_new();
+
+
+    /* =========================
+       NAMA SHEET
+       ========================= */
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Data Solar Panel"
+    );
+
+
+    /* =========================
+       NAMA FILE
+       ========================= */
+
+    const startFile =
+      formatDateForFile(
+        startDate
+      );
+
+
+    const endFile =
+      formatDateForFile(
+        endDate
+      );
+
+
+    const fileName =
+      "Data_Solar_Panel_" +
+      startFile +
+      "_sampai_" +
+      endFile +
+      ".xlsx";
+
+
+    /* =========================
+       DOWNLOAD
+       ========================= */
+
+    XLSX.writeFile(
+      workbook,
+      fileName
+    );
+
+
+    /* =========================
+       STATUS SUKSES
+       ========================= */
+
+    status.textContent =
+      "Berhasil export " +
+      allData.length +
+      " data ke Excel.";
+
+    status.className =
+      "export-status export-success";
+
+
+  }catch(error){
+
+
+    console.error(
+      error
+    );
+
+
+    status.textContent =
+      "Export gagal: " +
+      error.message;
+
+    status.className =
+      "export-status export-error";
+
+
+  }finally{
+
+
+    button.disabled =
+      false;
+
+
+    button.textContent =
+      "📥 EXPORT DATA KE EXCEL";
+
+
+  }
+
+}
+
+
+/* =========================================================
+   FORMAT TANGGAL UNTUK NAMA FILE
+   ========================================================= */
+
+function formatDateForFile(
+  date
+){
+
+  const year =
+    date.getFullYear();
+
+
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  return (
+    year +
+    "-" +
+    month +
+    "-" +
+    day
+  );
+
+}
+
+
+/* =========================================================
+   SET DEFAULT WAKTU EXPORT
+   =========================================================
+
+   Default:
+   - mulai = hari ini 00:00
+   - akhir = waktu sekarang
+
+   ========================================================= */
+
+function setDefaultDateTime(){
+
+  const now =
+    new Date();
+
+
+  const start =
+    new Date();
+
+
+  start.setHours(
+    0,
+    0,
+    0,
+    0
+  );
+
+
+  document.getElementById(
+    "startDate"
+  ).value =
+    toDateTimeLocalValue(
+      start
+    );
+
+
+  document.getElementById(
+    "endDate"
+  ).value =
+    toDateTimeLocalValue(
+      now
+    );
+
+}
+
+
+/* =========================================================
+   FORMAT UNTUK INPUT DATETIME-LOCAL
+   ========================================================= */
+
+function toDateTimeLocalValue(
+  date
+){
+
+  const year =
+    date.getFullYear();
+
+
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  const hours =
+    String(
+      date.getHours()
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  const minutes =
+    String(
+      date.getMinutes()
+    ).padStart(
+      2,
+      "0"
+    );
+
+
+  return (
+    year +
+    "-" +
+    month +
+    "-" +
+    day +
+    "T" +
+    hours +
+    ":" +
+    minutes
+  );
+
+}
+
+
+/* =========================================================
+   DEFAULT EXPORT
+   ========================================================= */
+
+setDefaultDateTime();
+
 
 /* =========================================================
    SUPABASE REALTIME
-   =========================================================
-
-   Jika Realtime diaktifkan pada Supabase,
-   dashboard dapat menerima perubahan secara langsung.
-
    ========================================================= */
 
 supabaseClient
@@ -1252,23 +1989,25 @@ supabaseClient
     "solar-dashboard"
   )
 
+  /* =========================
+     SOLAR DATA
+     ========================= */
+
   .on(
 
     "postgres_changes",
 
     {
-
       event:"*",
-
       schema:"public",
-
       table:"solar_data"
-
     },
 
     payload => {
 
-      if(payload.new){
+      if(
+        payload.new
+      ){
 
         displayData(
           payload.new
@@ -1280,30 +2019,33 @@ supabaseClient
 
   )
 
+
+  /* =========================
+     SOLAR CONTROL
+     ========================= */
+
   .on(
 
     "postgres_changes",
 
     {
-
       event:"*",
-
       schema:"public",
-
       table:"solar_control"
-
     },
 
     payload => {
 
-      if(payload.new){
+
+      if(
+        payload.new
+      ){
 
         const d =
           payload.new;
 
 
-
-        /* ================= POMPA ================= */
+        /* POMPA */
 
         const pumpStatus =
           document.getElementById(
@@ -1323,8 +2065,7 @@ supabaseClient
             : "#dc2626";
 
 
-
-        /* ================= MOTOR ================= */
+        /* MOTOR */
 
         const motorStatus =
           document.getElementById(
@@ -1347,6 +2088,7 @@ supabaseClient
     }
 
   )
+
 
   .subscribe();
 
